@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
+import openpyxl as pyxl
 
 def read_conditions(file_name = "asst-3-Q1.txt"):
     with open(os.path.dirname(__file__)+"/"+file_name,'r') as f:
