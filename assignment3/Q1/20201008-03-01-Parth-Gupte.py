@@ -1,5 +1,4 @@
 import os
-import pandas as pd
 import numpy as np
 import openpyxl as pyxl
 
@@ -16,10 +15,18 @@ def read_conditions(file_name = "asst-3-Q1.txt"):
     return cond_lst
 
 def read_data(file_name = "asst-3-Q1.xlsx"):
-    f = open(os.path.dirname(__file__)+"/"+file_name,'r')
-    data = pd.read_excel(os.path.dirname(__file__)+"/"+file_name,header=None)
-    data.dropna(inplace=True)
-    return data
+    wb_obj = pyxl.load_workbook(os.path.dirname(__file__)+"/"+file_name)
+
+    sheet_obj = wb_obj.active
+    m_row = sheet_obj.max_row
+    m_col = sheet_obj.max_column
+
+    data_arr = np.empty((m_row,m_col))
+    for i in range(m_row):
+        for j in range(m_col):
+            cell_obj = sheet_obj.cell(row = i+1, column = j+1)
+            data_arr[i,j] = cell_obj.value
+    return data_arr
 
 def fix_row(row,cond):
     #checking range
@@ -33,27 +40,30 @@ def fix_row(row,cond):
         elif cond[0] == 'float':
             if float(x) != x:
                 break
+        elif x == np.nan:
+            break
     else:
         if cond[0] == 'int':
             return [int(x) for x in row]
         elif cond[0] == 'float':
             return [float(x) for x in row]
         
-    return [np.NaN]*len(row)
+    return []
     
-def fix_data(data:pd.DataFrame):
+def fix_data(data:np.ndarray):
     '''
-    Input a dataframe and a cleaned dataframe is returned
+    Input an array and a cleaned array is returned
     '''
+    new_data_lst = []
     for i in range(len(data)):
-        row = list(data.loc[i])
+        row = list(data[i])
         new_row = fix_row(row,cond_lst[i])
-        data.loc[i] = new_row
-    data.dropna(inplace= True)
-    return data
+        if new_row != []:
+            new_data_lst.append(new_row)
+    return np.array(new_data_lst)
 
 
 cond_lst = read_conditions()
 data = read_data()
-fix_data(data)
-print("20201008", len(data))
+new_data = fix_data(data)
+print("20201008", len(new_data))
