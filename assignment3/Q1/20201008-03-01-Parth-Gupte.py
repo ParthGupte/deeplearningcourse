@@ -32,7 +32,9 @@ def fix_row(row,cond):
     #checking range
     l, u = cond[1:]
     for x in row:
-        if x<l or x>u:
+        if x == np.nan:
+            break
+        elif x<l or x>u:
             break
         elif cond[0] == 'int':
             if int(x) != x:
@@ -40,8 +42,6 @@ def fix_row(row,cond):
         elif cond[0] == 'float':
             if float(x) != x:
                 break
-        elif x == np.nan:
-            break
     else:
         if cond[0] == 'int':
             return [int(x) for x in row]
